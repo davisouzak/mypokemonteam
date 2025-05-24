@@ -8,8 +8,8 @@ import {
 	Grid,
 	Stack,
 	Dialog,
-  Portal,
-  SimpleGrid,
+	Portal,
+	SimpleGrid,
 } from '@chakra-ui/react'
 import type { Team } from '../types/team'
 import { useTeam } from '../context/TeamContext'
@@ -146,61 +146,61 @@ const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
 						mt={3}
 					>
 						<Dialog.Root>
-                                  <Dialog.Trigger asChild>
-                                    <Button
-                                      colorScheme='blue'
-                                      variant='outline'
-                                      size='sm'
-                                    >
-                                      Ver time
-                                    </Button>
-                                  </Dialog.Trigger>
-                                  <Portal>
-                                    <Dialog.Backdrop />
-                                    <Dialog.Positioner>
-                                      <Dialog.Content>
-                                        <Dialog.Header>
-                                          <Dialog.Title>Time: {team.name}</Dialog.Title>
-                                        </Dialog.Header>
-                                        <Dialog.Body>
-                                          <Text
-                                            color='gray.600'
-                                            mb={4}
-                                          >
-                                            {team.description}
-                                          </Text>
-            
-                                          <SimpleGrid
-                                            columns={3}
-                                            gap={2}
-                                          >
-                                            {team.pokemon.map((pokemon) => (
-                                              <Box
-                                                key={pokemon.id}
-                                                textAlign='center'
-                                              >
-                                                <Image
-                                                  src={pokemon.image}
-                                                  alt={pokemon.name}
-                                                  boxSize='60px'
-                                                  objectFit='contain'
-                                                  mx='auto'
-                                                />
-                                                <Text
-                                                  fontSize='xs'
-                                                  mt={1}
-                                                  textTransform='capitalize'
-                                                >
-                                                  {pokemon.name}
-                                                </Text>
-                                              </Box>
-                                            ))}
-                                          </SimpleGrid>
-                                        </Dialog.Body>
-                                      </Dialog.Content>
-                                    </Dialog.Positioner>
-                                  </Portal>
-                                </Dialog.Root>
+							<Dialog.Trigger asChild>
+								<Button
+									colorScheme='blue'
+									variant='outline'
+									size='sm'
+								>
+									Ver time
+								</Button>
+							</Dialog.Trigger>
+							<Portal>
+								<Dialog.Backdrop />
+								<Dialog.Positioner>
+									<Dialog.Content>
+										<Dialog.Header>
+											<Dialog.Title>Time: {team.name}</Dialog.Title>
+										</Dialog.Header>
+										<Dialog.Body>
+											<Text
+												color='gray.600'
+												mb={4}
+											>
+												{team.description}
+											</Text>
+
+											<SimpleGrid
+												columns={3}
+												gap={2}
+											>
+												{team.pokemon.map((pokemon) => (
+													<Box
+														key={pokemon.id}
+														textAlign='center'
+													>
+														<Image
+															src={pokemon.image}
+															alt={pokemon.name}
+															boxSize='60px'
+															objectFit='contain'
+															mx='auto'
+														/>
+														<Text
+															fontSize='xs'
+															mt={1}
+															textTransform='capitalize'
+														>
+															{pokemon.name}
+														</Text>
+													</Box>
+												))}
+											</SimpleGrid>
+										</Dialog.Body>
+									</Dialog.Content>
+								</Dialog.Positioner>
+							</Portal>
+						</Dialog.Root>
 
 						<Button
 							colorScheme='red'
