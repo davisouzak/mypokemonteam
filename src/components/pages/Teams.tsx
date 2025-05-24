@@ -18,6 +18,7 @@ const Teams: React.FC = () => {
   const { teams } = useTeam();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
+
   return (
     <Container maxW="container.xl" py={8}>
       <VStack gap={8} align="stretch">

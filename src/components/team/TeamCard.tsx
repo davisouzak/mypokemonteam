@@ -5,7 +5,6 @@ import {
 	Text,
 	Image,
 	Badge,
-	useDisclosure,
 	Grid,
 	Stack,
 	Dialog,
@@ -21,12 +20,9 @@ interface TeamCardProps {
 
 const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
 	const { deleteTeam } = useTeam()
-	const { onOpen, onClose } = useDisclosure()
-	const cancelRef = React.useRef<HTMLButtonElement>(null)
 
 	const handleDeleteTeam = () => {
 		deleteTeam(team.id)
-		onClose()
 	}
 
 	const getTeamStatus = () => ({
@@ -210,48 +206,13 @@ const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
 							colorScheme='red'
 							variant='outline'
 							size='sm'
-							onClick={onOpen}
+							onClick={handleDeleteTeam}
 						>
 							Deletar
 						</Button>
 					</Box>
 				</Stack>
 			</Box>
-
-			<Dialog.Root>
-				<Dialog.Backdrop />
-				<Dialog.Positioner>
-					<Dialog.Content borderRadius='md'>
-						<Dialog.Header fontWeight='bold'>Excluir Time</Dialog.Header>
-						<Dialog.Body>
-							Tem certeza que deseja excluir o time "{team.name}"? Esta ação não
-							pode ser desfeita.
-						</Dialog.Body>
-						<Dialog.Footer>
-							<Button
-								ref={cancelRef}
-								onClick={onClose}
-								size='sm'
-							>
-								Cancelar
-							</Button>
-							<Button
-								colorScheme='red'
-								onClick={handleDeleteTeam}
-								ml={3}
-								size='sm'
-							>
-								Excluir
-							</Button>
-						</Dialog.Footer>
-						<Dialog.CloseTrigger
-							position='absolute'
-							top='3'
-							right='3'
-						/>
-					</Dialog.Content>
-				</Dialog.Positioner>
-			</Dialog.Root>
 		</>
 	)
 }
