@@ -6,12 +6,8 @@ import {
 	Button,
 	Container,
 	HStack,
-	ChakraProvider,
-	defaultSystem,
 } from '@chakra-ui/react'
 import { Link, useLocation } from 'react-router-dom'
-// import { ColorModeButton } from '../ui/color-mode'
-import { ColorModeProvider } from '../ui/color-mode'
 
 interface LayoutProps {
 	children: ReactNode
@@ -29,8 +25,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 	} as const
 
 	return (
-		<ChakraProvider value={defaultSystem}>
-			<ColorModeProvider>
 				<Box minHeight='100vh'>
 					<Box
 						bg='blue.500'
@@ -90,8 +84,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 					<Box flex='1'>{children}</Box>
 				</Box>
-			</ColorModeProvider>
-		</ChakraProvider>
 	)
 }
 
