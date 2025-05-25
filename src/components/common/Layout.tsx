@@ -10,7 +10,7 @@ import {
 	defaultSystem,
 } from '@chakra-ui/react'
 import { Link, useLocation } from 'react-router-dom'
-import { ColorModeButton } from '../ui/color-mode'
+// import { ColorModeButton } from '../ui/color-mode'
 import { ColorModeProvider } from '../ui/color-mode'
 
 interface LayoutProps {
@@ -44,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 								justify='space-between'
 								align='center'
 							>
-								<ColorModeButton />
+								{/* <ColorModeButton /> */}
 								<Heading size='lg'>My Team Pokemon</Heading>
 								<HStack gap={4}>
 									<Link to={paths.home}>
