@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
 	Box,
 	Container,
@@ -20,7 +20,7 @@ import {
 	HStack,
 	createListCollection,
 } from '@chakra-ui/react'
-import { useTeam } from '../context/TeamContext' 
+import { useTeam } from '../context/TeamContext'
 
 interface PokemonData {
 	id: number
@@ -68,6 +68,8 @@ export default function Pokemon() {
 	)
 	const [selectedTeamId, setSelectedTeamId] = useState<string>('')
 	const [addingToTeam, setAddingToTeam] = useState<boolean>(false)
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('')
+	const [searchLoading, setSearchLoading] = useState(false)
 
 	const observer = useRef<IntersectionObserver | null>(null)
 	const loadingRef = useRef<HTMLDivElement>(null)
@@ -81,6 +83,16 @@ export default function Pokemon() {
 			pokemon: team.pokemon,
 		})),
 	})
+
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm)
+		}, 300)
+
+		return () => {
+			clearTimeout(handler)
+		}
+	}, [searchTerm])
 
 	const fetchPokemon = useCallback(async (pageNumber: number) => {
 		try {
@@ -107,6 +119,36 @@ export default function Pokemon() {
 			setLoading(false)
 		}
 	}, [])
+
+	useEffect(() => {
+		if (debouncedSearchTerm.length > 3) {
+			const fetchSearchedPokemon = async () => {
+				try {
+					setSearchLoading(true)
+					const response = await fetch(
+						`https://pokeapi.co/api/v2/pokemon/${debouncedSearchTerm.toLowerCase()}`
+					)
+					if (response.ok) {
+						const data = await response.json()
+						setPokemon([data])
+						setHasMore(false)
+					}
+				} catch (error) {
+					console.error('Pokémon não encontrado:', error)
+					setPokemon([])
+				} finally {
+					setSearchLoading(false)
+				}
+			}
+
+			fetchSearchedPokemon()
+		} else if (debouncedSearchTerm.length === 0) {
+			setPokemon([])
+			setPage(1)
+			setHasMore(true)
+			fetchPokemon(1)
+		}
+	}, [debouncedSearchTerm, fetchPokemon])
 
 	useEffect(() => {
 		fetchPokemon(page)
@@ -177,12 +219,19 @@ export default function Pokemon() {
 		}
 	}
 
-	const filteredPokemon = pokemon
-		.filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-		.filter(
-			(p, index, self) =>
-				index === self.findIndex((pokemon) => pokemon.name === p.name)
-		)
+	const filteredPokemon = useMemo(() => {
+		if (debouncedSearchTerm.length <= 3) {
+			return pokemon
+				.filter((p) =>
+					p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+				)
+				.filter(
+					(p, index, self) =>
+						index === self.findIndex((pokemon) => pokemon.name === p.name)
+				)
+		}
+		return pokemon
+	}, [pokemon, debouncedSearchTerm])
 
 	const getTypeColor = (type: string) => {
 		const typeColors: { [key: string]: string } = {
@@ -207,6 +256,15 @@ export default function Pokemon() {
 		}
 
 		return typeColors[type] || '#777777'
+	}
+
+	function handlePokemonSelect(name: string): void {
+		const found = pokemon.find(
+			(p) => p.name.toLowerCase() === name.toLowerCase()
+		)
+		if (found) {
+			openPokemonModal(found)
+		}
 	}
 
 	return (
@@ -252,13 +310,27 @@ export default function Pokemon() {
 						boxShadow='md'
 						value={searchTerm}
 						onChange={(e) => setSearchTerm(e.target.value)}
+						list='pokemon-list'
 					/>
+					<datalist id='pokemon-list'>
+						{filteredPokemon.map((pokemon) => (
+							<option
+								key={pokemon.name}
+								value={pokemon.name}
+								onClick={() => handlePokemonSelect(pokemon.name)}
+							/>
+						))}
+					</datalist>
 				</Box>
 
 				{loading && page === 1 ? (
 					<Center py={20}>
 						<Box textAlign='center'>
-							<Text color='gray.600'>Carregando Pokémon...</Text>
+							<Text color='gray.600'>
+								{searchLoading
+									? 'Buscando Pokémon...'
+									: 'Carregando Pokémon...'}
+							</Text>
 						</Box>
 					</Center>
 				) : (
@@ -539,7 +611,7 @@ export default function Pokemon() {
 																? details.value[0] ?? ''
 																: details.value
 															setSelectedTeamId(value)
-														}} 
+														}}
 													>
 														<Select.HiddenSelect />
 														<Select.Label>Selecione um time</Select.Label>
@@ -551,19 +623,19 @@ export default function Pokemon() {
 																<Select.Indicator />
 															</Select.IndicatorGroup>
 														</Select.Control>
-															<Select.Positioner>
-																<Select.Content>
-																	{teams.map((team) => (
-																		<Select.Item
-																			item={team.id}
-																			key={team.id}
-																		>
-																			{team.name} ({team.pokemon.length}/6)
-																			<Select.ItemIndicator />
-																		</Select.Item>
-																	))}
-																</Select.Content>
-															</Select.Positioner>
+														<Select.Positioner>
+															<Select.Content>
+																{teams.map((team) => (
+																	<Select.Item
+																		item={team.id}
+																		key={team.id}
+																	>
+																		{team.name} ({team.pokemon.length}/6)
+																		<Select.ItemIndicator />
+																	</Select.Item>
+																))}
+															</Select.Content>
+														</Select.Positioner>
 													</Select.Root>
 												</Box>
 											)}
@@ -580,7 +652,6 @@ export default function Pokemon() {
 													colorScheme='blue'
 													onClick={handleAddToTeam}
 													loading={addingToTeam}
-													loadingText='Adicionando...'
 													disabled={!selectedTeamId || addingToTeam}
 												>
 													Adicionar ao Time
